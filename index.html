@@ -3,60 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית - Pro Edition</title>
+    <title>מתרגל ערבית למתקדמים - גרסה 16.0</title>
     <style>
-        :root { --primary: #1a73e8; --success: #34a853; --error: #d93025; --bg: #f8f9fa; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: right; }
-        .question-box { background: #e8f0fe; padding: 25px; border-radius: 20px; margin-bottom: 25px; border-right: 6px solid var(--primary); }
-        .question-text { font-size: 21px; font-weight: 800; color: #202124; line-height: 1.6; }
-        input { width: 100%; padding: 18px; border: 2px solid #dadce0; border-radius: 14px; font-size: 19px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
-        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 14px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
-        .feedback { margin-top: 25px; padding: 20px; border-radius: 18px; display: none; }
-        .correct { background: #e6f4ea; color: #137333; border: 1px solid #34a853; }
-        .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #d93025; }
-        .explanation { font-size: 15px; line-height: 1.6; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px; }
+        :root { --primary: #1a73e8; --success: #34a853; --bg: #f8f9fa; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: right; }
+        .question-box { background: #e8f0fe; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-right: 5px solid var(--primary); }
+        .question-text { font-size: 19px; font-weight: 700; color: #202124; line-height: 1.6; }
+        input { width: 100%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
+        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 15px; display: none; border: 1px solid #ddd; }
+        .correct { background: #e6f4ea; color: #137333; border-color: #34a853; }
+        .wrong { background: #fce8e6; color: #c5221f; border-color: #d93025; }
+        .explanation-section { margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; font-size: 14px; line-height: 1.6; }
+        .step { margin-bottom: 12px; }
+        .step-title { font-weight: bold; color: var(--primary); margin-bottom: 4px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="card">
+    <div style="text-align:center; font-weight:bold; color:var(--primary); margin-bottom:15px;">תרגול דקדוק מתקדם 🧠</div>
     <div class="question-box">
-        <div id="question" class="question-text">מייצר תרגיל מתקדם...</div>
+        <div id="question" class="question-text">מייצר תרגיל...</div>
     </div>
     
     <input type="text" id="answer" placeholder="הקלד תשובה בתעתיק..." autocomplete="off">
     <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
     
     <div id="feedback" class="feedback">
-        <div id="status" style="font-weight:bold; font-size: 20px; margin-bottom:10px;"></div>
-        <div id="correct-ans" style="font-size: 22px; margin-bottom: 15px; text-align:center; direction:ltr; font-weight: bold; color: var(--primary);"></div>
-        <div id="exp" class="explanation"></div>
+        <div id="status" style="font-weight:bold; font-size: 18px; margin-bottom:10px;"></div>
+        <div id="correct-ans" style="font-size: 20px; margin-bottom: 15px; text-align:center; direction:ltr; font-weight: bold; color: var(--primary);"></div>
+        <div id="exp" class="explanation-section"></div>
     </div>
     
     <button id="next-btn" class="btn" style="display:none; background: var(--success); margin-top:10px" onclick="generateQuestion()">לשאלה הבאה ⮕</button>
 </div>
 
 <script>
-    // מאגר נתונים חכם עם הגדרות דקדוקיות
     const data = {
         verbs: [
-            {h:'ראיתי', s:'שופת', root:'שאף', type:'hollow'},
-            {h:'קניתי', s:'אשתרית', root:'אשתרא', type:'endA'},
-            {h:'אכלתי', s:'אכלת', root:'אכל', type:'reg'},
-            {h:'ביקרתי', s:'זורת', root:'זאר', type:'hollow'},
-            {h:'נהגתי', s:'סוקת', root:'סאק', type:'hollow'}
+            {h:'קניתי', s:'אשתרית', root:'אשתרא', desc:'שורש המסתיימת באות חלשה (א/י). בגוף "אני" בעבר האות הופכת ל-י\' ונוספת ת\'.'},
+            {h:'ראיתי', s:'שופת', root:'שאף', desc:'פועל "חלול" (ע\' הפועל היא א\'). בגוף "אני" בעבר ה-א\' נשמטת והתנועה הופכת ל-u.'},
+            {h:'אכלתי', s:'אכלת', root:'אכל', desc:'פועל שלם (רגיל). בגוף "אני" בעבר פשוט מוסיפים ת\' שקטה בסוף.'},
+            {h:'נהגתי', s:'סוקת', root:'סאק', desc:'פועל "חלול". בגוף "אני" בעבר ה-א\' נשמטת והתנועה הופכת ל-u.'},
+            {h:'דיברתי', s:'חכּית', root:'חכּא', desc:'שורש המסתיימת באות חלשה. בגוף "אני" בעבר האות הופכת ל-י\' ונוספת ת\'.'}
         ],
         nouns: [
             {h:'התפוחים', s:'תפאח', isSun: true},
             {h:'השכנים', s:'ג\'יראן', isSun: false},
-            {h:'החברים', s:'אסחאב', isSun: false},
-            {h:'הבית', s:'בית', isSun: false}
+            {h:'החברים', s:'אסחאב', isSun: false}
         ],
         connectors: [
             {h:'לפני ש', s:'קבל מא'},
-            {h:'אחרי ש', s:'בעד מא'},
-            {h:'כאשר', s:'למא'}
+            {h:'אחרי ש', s:'בעד מא'}
         ]
     };
 
@@ -68,21 +68,19 @@
         document.getElementById('action-btn').style.display = 'block';
         document.getElementById('answer').value = '';
 
-        // הגרלת משפט עם הגיון: פועל1 -> שם עצם -> מילת קישור -> פועל2
         const v1 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
+        let v2 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
+        while(v1 === v2) v2 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
+        
         const n = data.nouns[Math.floor(Math.random() * data.nouns.length)];
         const conn = data.connectors[Math.floor(Math.random() * data.connectors.length)];
-        
-        // בחירת פועל שני שונה מהראשון למניעת כפילות
-        let v2 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
-        while(v2.h === v1.h) v2 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
 
-        const articulatedNoun = n.isSun ? `א-${n.s}` : `אל-${n.s}`;
+        const artNoun = n.isSun ? `א-${n.s}` : `אל-${n.s}`;
         
         cur = {
             text: `איך אומרים: "${v1.h} את ${n.h} ${conn.h}${v2.h}"?`,
-            ans: `${v1.s} ${articulatedNoun} ${conn.s} ${v2.s}`,
-            v1, v2, n, conn, articulatedNoun
+            ans: `${v1.s} ${artNoun} ${conn.s} ${v2.s}`,
+            v1, v2, n, conn, artNoun
         };
 
         document.getElementById('question').innerText = cur.text;
@@ -94,17 +92,15 @@
         const f = document.getElementById('feedback');
         
         const isCorrect = (u === a || u === a.replace(/ /g, ""));
-        document.getElementById('status').innerText = isCorrect ? "כל הכבוד! ✅" : "שים לב לתיקון ❌";
+        document.getElementById('status').innerText = isCorrect ? "נכון מאוד! ✅" : "טעות ❌";
         f.className = isCorrect ? "feedback correct" : "feedback wrong";
         document.getElementById('correct-ans').innerText = cur.ans;
         
-        // הסבר דקדוקי מפורט
-        let exp = `<b>ניתוח המשפט:</b><br>`;
-        exp += `1. <b>${cur.v1.h}:</b> בשורש חלול כמו ${cur.v1.root}, ה-א' הופכת ל-u בנטיית "אני" (<b>${cur.v1.s}</b>).<br>`;
-        exp += `2. <b>${cur.n.h}:</b> האות ${cur.n.s[0]} היא אות ${cur.n.isSun ? 'שמש' : 'ירח'}, לכן אומרים <b>${cur.articulatedNoun}</b>.<br>`;
-        exp += `3. <b>אין "את":</b> בערבית מחברים את הפועל ישירות לשם העצם המיודע.`;
+        let expHtml = `<div class="step"><span class="step-title">1. אותיות שמש/ירח:</span> המילה "${cur.n.s}" מתחילה ב-${cur.n.s[0]}, שהיא אות ${cur.n.isSun ? 'שמש (ה-ל\' נבלעת)' : 'ירח (ה-ל\' נשמעת)'}. לכן: <b>${cur.artNoun}</b>.</div>`;
+        expHtml += `<div class="step"><span class="step-title">2. נטיית פועל (גוף "אני"):</span> הפועל "${cur.v1.h}" (שורש ${cur.v1.root}): ${cur.v1.desc}</div>`;
+        expHtml += `<div class="step"><span class="step-title">3. מילת קישור:</span> ${cur.conn.s} משמשת לחיבור שני פעלים בעבר.</div>`;
         
-        document.getElementById('exp').innerHTML = exp;
+        document.getElementById('exp').innerHTML = expHtml;
         f.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('action-btn').style.display = 'none';
