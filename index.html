@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מתרגל ערבית - גרסה יציבה</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 15px; margin: 0; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; margin-top: 20px; }
+        h1 { color: #1a73e8; font-size: 22px; margin-bottom: 10px; }
+        .category { color: #5f6368; font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .question-box { margin: 20px 0; font-size: 19px; font-weight: bold; color: #202124; min-height: 50px; }
+        input { width: 90%; padding: 12px; border: 2px solid #dadce0; border-radius: 8px; font-size: 16px; text-align: center; margin-bottom: 15px; outline: none; }
+        button { background: #1a73e8; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        .feedback { margin-top: 15px; padding: 12px; border-radius: 8px; display: none; font-weight: bold; }
+        .correct { background: #e6f4ea; color: #1e8e3e; }
+        .wrong { background: #fce8e6; color: #d93025; }
+        .stats { margin-top: 20px; font-size: 14px; color: #70757a; border-top: 1px solid #dadce0; padding-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>אלגוריתם ג'מיני 🧠</h1>
+    <div id="category-label" class="category">מתחילים...</div>
+    <div id="question" class="question-box">טוען שאלה ראשונה...</div>
+    
+    <input type="text" id="answer" placeholder="הקלד תשובה בתעתיק..." autocomplete="off" ontouchstart="">
+    
+    <button id="action-btn" onclick="checkAnswer()">בדוק תשובה</button>
+    <div id="feedback" class="feedback"></div>
+    <button id="next-btn" style="display:none; margin-top: 10px; background: #34a853;" onclick="generateQuestion()">שאלה הבאה ⮕</button>
+
+    <div class="stats">
+        ניקוד: <span id="score">0</span> | רמה 2
+    </div>
+</div>
+
+<script>
+    // רשימת פעלים ושמות עצם מהשיעור שלך
+    const verbs = [
+        { h: 'אכל', s: 'אכל' }, { h: 'פתח', s: 'פתח' }, { h: 'ישב', s: 'קעד' },
+        { h: 'שאל', s: 'סאל' }, { h: 'נכנס', s: 'דח\'ל' }, { h: 'שחה', s: 'סבח' },
+        { h: 'בישל', s: 'טבח\'' }, { h: 'קנה', s: 'אשתרא' }, { h: 'ראה', s: 'שאף' },
+        { h: 'הלך', s: 'ראח' }, { h: 'שתה', s: 'שרב' }
+    ];
+
+    const nouns = [
+        { h: 'כיסא', s: 'כרסי', p: 'כראסי', d: 'כרסיין' },
+        { h: 'שכן', s: 'ג\'אר', p: 'ג\'יראן', d: 'ג\'ארין' },
+        { h: 'תפוח', s: 'תפאחה', p: 'תפאח', d: 'תפאחתיין' }
+    ];
+
+    let currentQuestion = {};
+    let score = 0;
+
+    function generateQuestion() {
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('action-btn').style.display = 'block';
+        document.getElementById('answer').value = '';
+        document.getElementById('answer').disabled = false;
+
+        const r = Math.random();
+        if (r < 0.4) { // פעלים
+            const v = verbs[Math.floor(Math.random() * verbs.length)];
+            const neg = Math.random() > 0.5;
+            currentQuestion = { 
+                cat: 'פעלים בעבר', 
+                text: neg ? `איך אומרים: הוא לא ${v.h}?` : `איך אומרים: הוא ${v.h}?`,
+                ans: neg ? `מא ${v.s}` : v.s
+            };
+        } else if (r < 0.7) { // מספרים וזוגי
+            const n = nouns[Math.floor(Math.random() * nouns.length)];
+            const isDual = Math.random() > 0.6;
+            if (isDual) {
+                currentQuestion = { cat: 'זוגי', text: `איך אומרים: "שני ${n.h}ים"?`, ans: n.d };
+            } else {
+                const num = Math.floor(Math.random() * 10) + 11; // 11-20
+                currentQuestion = { cat: 'מספרים (מעל 10)', text: `איך אומרים: "${num} ${n.h}ים"?`, ans: `${num} ${n.s}` };
+            }
+        } else { // קניין
+            const n = nouns[Math.floor(Math.random() * nouns.length)];
+            currentQuestion = { cat: 'קניין', text: `איך אומרים: "${n.h} שלי"?`, ans: n.s + 'י' };
+        }
+
+        document.getElementById('category-label').innerText = currentQuestion.cat;
+        document.getElementById('question').innerText = currentQuestion.text;
+    }
+
+    function checkAnswer() {
+        const user = document.getElementById('answer').value.trim().toLowerCase().replace("'", "");
+        const correct = currentQuestion.ans.toLowerCase().replace("'", "");
+        const f = document.getElementById('feedback');
+        
+        if (user === correct || user.includes(correct)) {
+            f.innerText = "נכון! כל הכבוד.";
+            f.className = "feedback correct";
+            score += 10;
+        } else {
+            f.innerText = `טעות. התשובה: ${currentQuestion.ans}`;
+            f.className = "feedback wrong";
+        }
+        f.style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+        document.getElementById('action-btn').style.display = 'none';
+        document.getElementById('score').innerText = score;
+    }
+
+    // הפעלה מיידית ברגע שהדף נטען
+    window.onload = generateQuestion;
+</script>
+
+</body>
+</html>
