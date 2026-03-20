@@ -3,65 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית - דיוק תחבירי</title>
+    <title>מתרגל ערבית למתקדמים 14.0</title>
     <style>
-        :root { --primary: #1a73e8; --success: #34a853; --bg: #f8f9fa; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 550px; text-align: right; }
-        .question-box { background: #e8f0fe; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-right: 5px solid var(--primary); }
-        .question-text { font-size: 19px; font-weight: 700; color: #202124; line-height: 1.6; }
-        input { width: 100%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
-        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
-        .feedback { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; text-align: right; }
-        .correct { background: #e6f4ea; color: #137333; border: 1px solid #137333; }
-        .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
-        .explanation-text { font-size: 14px; line-height: 1.5; color: #3c4043; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
+        :root { --primary: #1a73e8; --success: #34a853; --error: #d93025; --bg: #f8f9fa; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: right; border: 1px solid #e0e0e0; }
+        .header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; color: var(--primary); font-size: 22px; font-weight: bold; }
+        .question-box { background: #f0f7ff; padding: 25px; border-radius: 18px; margin-bottom: 25px; border-right: 6px solid var(--primary); }
+        .question-text { font-size: 20px; font-weight: 800; color: #202124; line-height: 1.6; }
+        input { width: 100%; padding: 18px; border: 2px solid #dfe1e5; border-radius: 14px; font-size: 18px; margin-bottom: 20px; box-sizing: border-box; text-align: center; transition: 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 8px rgba(26,115,232,0.2); }
+        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 14px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .feedback { margin-top: 25px; padding: 20px; border-radius: 16px; display: none; }
+        .correct { background: #e6f4ea; color: #137333; border: 1px solid #c6e7d1; }
+        .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+        .explanation { font-size: 15px; line-height: 1.6; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.06); color: #5f6368; }
     </style>
 </head>
 <body>
 
 <div class="card">
+    <div class="header">🧠 אלגוריתם ג'ימיני למתקדמים</div>
+    
     <div class="question-box">
-        <div id="question" class="question-text">מייצר משפט...</div>
+        <div id="question" class="question-text">מייצר משפט הגיוני...</div>
     </div>
     
     <input type="text" id="answer" placeholder="הקלד תשובה בתעתיק..." autocomplete="off">
     <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
     
     <div id="feedback" class="feedback">
-        <div id="feedback-status" style="font-weight:bold; margin-bottom:8px;"></div>
-        <div id="feedback-ans" style="font-size: 19px; margin-bottom: 5px; color: #1a73e8;"></div>
-        <div id="feedback-exp" class="explanation-text"></div>
+        <div id="status" style="font-weight: bold; font-size: 18px; margin-bottom: 8px;"></div>
+        <div id="correct-ans" style="font-size: 20px; margin-bottom: 10px; direction: ltr; text-align: center;"></div>
+        <div id="exp" class="explanation"></div>
     </div>
     
-    <button id="next-btn" class="btn" style="display:none; background: var(--success); margin-top:10px" onclick="generateQuestion()">לתרגיל הבא ⮕</button>
+    <button id="next-btn" class="btn" style="display:none; background: var(--success); margin-top:10px" onclick="generateQuestion()">לשאלה הבאה ⮕</button>
 </div>
 
 <script>
-    const verbs = [
-        {h:'אכל', s:'אכל', t:'reg', q:'אכל'}, {h:'קנה', s:'אשתרא', t:'endA', q:'קני'},
-        {h:'ראה', s:'שאף', t:'hollow', q:'ראי'}, {h:'ביקר', s:'זאר', t:'hollow', q:'ביקר'},
-        {h:'דיבר עם', s:'חכּא מע', t:'endA', q:'דיבר'}
-    ];
-
-    const connectors = [
-        {h:'לפני ש', s:'קבל מא'}, {h:'אחרי ש', s:'בעד מא'}
-    ];
-
-    const nouns = [
-        {h:'השכנים', s:'אלג\'יראן'}, {h:'התפוחים', s:'אלתפאח'}, {h:'החברים', s:'אלאסחאב'}
+    // מאגר משופר עם לוגיקה של הקשר
+    const scenarios = [
+        {
+            v: {h:'ראיתי', s:'שופת', t:'hollow', root:'שאף'},
+            n: {h:'השכנים', s:'אלג\'יראן'},
+            c: {h:'לפני ש', s:'קבל מא'},
+            v2: {h:'אכלתי', s:'אכלת', t:'reg', root:'אכל'}
+        },
+        {
+            v: {h:'קניתי', s:'אשתרית', t:'endA', root:'אשתרא'},
+            n: {h:'התפוחים', s:'אלתפאח'},
+            c: {h:'אחרי ש', s:'בעד מא'},
+            v2: {h:'דיברתי', s:'חכּית', t:'endA', root:'חכּא'}
+        },
+        {
+            v: {h:'ביקרתי', s:'זורת', t:'hollow', root:'זאר'},
+            n: {h:'החברים', s:'אלאסחאב'},
+            c: {h:'כאשר', s:'למא'},
+            v2: {h:'נהגתי', s:'סוקת', t:'hollow', root:'סאק'}
+        }
     ];
 
     let cur = {};
-
-    function getVerbForm(v) {
-        if (v.t === 'endA') return { s: v.s.slice(0, -1) + "ית", exp: "פועל סופי (א'/י') הופך ל '-ית' בנטיית אני." };
-        if (v.t === 'hollow') {
-            const hols = { 'שאף':'שופת', 'סאק':'סוקת', 'זאר':'זורת' };
-            return { s: hols[v.s], exp: "פועל חלול - ה-א' נשמטת והופכת לתנועה קצרה (u)." };
-        }
-        return { s: v.s + "ת", exp: "פועל רגיל מקבל סיומת ת'." };
-    }
 
     function generateQuestion() {
         document.getElementById('feedback').style.display = 'none';
@@ -69,22 +73,18 @@
         document.getElementById('action-btn').style.display = 'block';
         document.getElementById('answer').value = '';
 
-        const v1 = verbs[Math.floor(Math.random() * verbs.length)];
-        const v2 = verbs[Math.floor(Math.random() * verbs.length)];
-        const conn = connectors[Math.floor(Math.random() * connectors.length)];
-        const n = nouns[Math.floor(Math.random() * nouns.length)];
-
-        const vf1 = getVerbForm(v1);
-        const vf2 = getVerbForm(v2);
-
-        // בעברית נוסיף "את" למען ההגיון, בערבית נוריד אותה.
-        let needsEtInHebrew = !v1.h.includes('עם');
-        let q = `איך אומרים: "${v1.q}תי ${needsEtInHebrew ? 'את ' : ''}${n.h} ${conn.h}${v2.q}תי"?`;
-        let a = `${vf1.s} ${n.s} ${conn.s} ${vf2.s}`;
+        const s = scenarios[Math.floor(Math.random() * scenarios.length)];
         
-        let exp = `💡 <b>טיפ לשוני:</b> בערבית אין מילה מקבילה ל-'את'. מחברים את הפועל ישירות לשם העצם המיודע.<br><br><b>הטיות בולטות:</b><br>• ${vf1.exp}<br>• ${vf2.exp}`;
+        // בערבית אין "את" - חיבור ישיר
+        cur = {
+            text: `איך אומרים: "${s.v.h} את ${s.n.h} ${s.c.h}${s.v2.h}"?`,
+            ans: `${s.v.s} ${s.n.s} ${s.c.s} ${s.v2.s}`,
+            exp: `<b>דקדוק:</b><br>
+                  • הפועל <b>${s.v.s}</b> (שורש ${s.v.root}) מוטה לגוף אני בעבר.<br>
+                  • מילת הקישור <b>${s.c.s}</b> מחברת בין שני פעלים.<br>
+                  • 💡 בערבית אין מילה ל-"את", הפועל מתחבר ישירות לשם העצם המיודע.`
+        };
 
-        cur = { text: q, ans: a, exp: exp };
         document.getElementById('question').innerText = cur.text;
     }
 
@@ -94,15 +94,15 @@
         const f = document.getElementById('feedback');
         
         if (u === a || u === a.replace(/ /g, "")) {
-            document.getElementById('feedback-status').innerText = "נכון מאוד! ✅";
+            document.getElementById('status').innerText = "נכון מאוד! ✅";
             f.className = "feedback correct";
         } else {
-            document.getElementById('feedback-status').innerText = "טעות ❌";
+            document.getElementById('status').innerText = "טעות ❌";
             f.className = "feedback wrong";
         }
         
-        document.getElementById('feedback-ans').innerHTML = `התשובה: <b>${cur.ans}</b>`;
-        document.getElementById('feedback-exp').innerHTML = cur.exp;
+        document.getElementById('correct-ans').innerText = cur.ans;
+        document.getElementById('exp').innerHTML = cur.exp;
         f.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('action-btn').style.display = 'none';
