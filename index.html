@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית - מילות דבק ומבנה משפט</title>
+    <title>מתרגל ערבית - דיוק תחבירי</title>
     <style>
         :root { --primary: #1a73e8; --success: #34a853; --bg: #f8f9fa; }
         body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
@@ -12,7 +12,7 @@
         .question-text { font-size: 19px; font-weight: 700; color: #202124; line-height: 1.6; }
         input { width: 100%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
         .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
-        .feedback { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; }
+        .feedback { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; text-align: right; }
         .correct { background: #e6f4ea; color: #137333; border: 1px solid #137333; }
         .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
         .explanation-text { font-size: 14px; line-height: 1.5; color: #3c4043; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
@@ -22,7 +22,7 @@
 
 <div class="card">
     <div class="question-box">
-        <div id="question" class="question-text">מייצר משפט מורכב...</div>
+        <div id="question" class="question-text">מייצר משפט...</div>
     </div>
     
     <input type="text" id="answer" placeholder="הקלד תשובה בתעתיק..." autocomplete="off">
@@ -30,7 +30,7 @@
     
     <div id="feedback" class="feedback">
         <div id="feedback-status" style="font-weight:bold; margin-bottom:8px;"></div>
-        <div id="feedback-ans" style="font-size: 19px; margin-bottom: 5px;"></div>
+        <div id="feedback-ans" style="font-size: 19px; margin-bottom: 5px; color: #1a73e8;"></div>
         <div id="feedback-exp" class="explanation-text"></div>
     </div>
     
@@ -41,12 +41,11 @@
     const verbs = [
         {h:'אכל', s:'אכל', t:'reg', q:'אכל'}, {h:'קנה', s:'אשתרא', t:'endA', q:'קני'},
         {h:'ראה', s:'שאף', t:'hollow', q:'ראי'}, {h:'ביקר', s:'זאר', t:'hollow', q:'ביקר'},
-        {h:'דיבר', s:'חכּא', t:'endA', q:'דיבר'}, {h:'נהג', s:'סאק', t:'hollow', q:'נהג'}
+        {h:'דיבר עם', s:'חכּא מע', t:'endA', q:'דיבר'}
     ];
 
     const connectors = [
-        {h:'לפני ש', s:'קבל מא'}, {h:'אחרי ש', s:'בעד מא'},
-        {h:'כאשר', s:'למא'}, {h:'עם', s:'מע'}, {h:'אצל', s:'ענד'}
+        {h:'לפני ש', s:'קבל מא'}, {h:'אחרי ש', s:'בעד מא'}
     ];
 
     const nouns = [
@@ -56,12 +55,12 @@
     let cur = {};
 
     function getVerbForm(v) {
-        if (v.t === 'endA') return { s: v.s.slice(0, -1) + "ית", exp: "פועל סופי (א'/י') מקבל סיומת -ית." };
+        if (v.t === 'endA') return { s: v.s.slice(0, -1) + "ית", exp: "פועל סופי (א'/י') הופך ל '-ית' בנטיית אני." };
         if (v.t === 'hollow') {
             const hols = { 'שאף':'שופת', 'סאק':'סוקת', 'זאר':'זורת' };
-            return { s: hols[v.s], exp: "פועל חלול - ה-א' נשמטת והתנועה משתנה ל-u." };
+            return { s: hols[v.s], exp: "פועל חלול - ה-א' נשמטת והופכת לתנועה קצרה (u)." };
         }
-        return { s: v.s + "ת", exp: "פועל רגיל בעבר מקבל סיומת ת'." };
+        return { s: v.s + "ת", exp: "פועל רגיל מקבל סיומת ת'." };
     }
 
     function generateQuestion() {
@@ -78,17 +77,12 @@
         const vf1 = getVerbForm(v1);
         const vf2 = getVerbForm(v2);
 
-        let q, a, exp;
-
-        if (conn.h.includes('ש')) {
-            q = `איך אומרים: "${v1.q}תי ${n.h} ${conn.h}${v2.q}תי"?`;
-            a = `${vf1.s} ${n.s} ${conn.s} ${vf2.s}`;
-            exp = `שימוש במילת הקישור <b>${conn.s}</b> לחיבור שני משפטים בעבר. <br>${vf1.exp} <br>${vf2.exp}`;
-        } else {
-            q = `איך אומרים: "${v1.q}תי ${conn.h} ${n.h}"?`;
-            a = `${vf1.s} ${conn.s} ${n.s}`;
-            exp = `מילת היחס <b>${conn.s}</b> מחברת בין הפועל לשם העצם. <br>${vf1.exp}`;
-        }
+        // בעברית נוסיף "את" למען ההגיון, בערבית נוריד אותה.
+        let needsEtInHebrew = !v1.h.includes('עם');
+        let q = `איך אומרים: "${v1.q}תי ${needsEtInHebrew ? 'את ' : ''}${n.h} ${conn.h}${v2.q}תי"?`;
+        let a = `${vf1.s} ${n.s} ${conn.s} ${vf2.s}`;
+        
+        let exp = `💡 <b>טיפ לשוני:</b> בערבית אין מילה מקבילה ל-'את'. מחברים את הפועל ישירות לשם העצם המיודע.<br><br><b>הטיות בולטות:</b><br>• ${vf1.exp}<br>• ${vf2.exp}`;
 
         cur = { text: q, ans: a, exp: exp };
         document.getElementById('question').innerText = cur.text;
@@ -100,7 +94,7 @@
         const f = document.getElementById('feedback');
         
         if (u === a || u === a.replace(/ /g, "")) {
-            document.getElementById('feedback-status').innerText = "מעולה! ✅";
+            document.getElementById('feedback-status').innerText = "נכון מאוד! ✅";
             f.className = "feedback correct";
         } else {
             document.getElementById('feedback-status').innerText = "טעות ❌";
