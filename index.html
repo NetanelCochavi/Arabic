@@ -3,78 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית - הרשימה המדויקת</title>
+    <title>מתרגל ערבית חכם 7.0</title>
     <style>
-        :root { --primary: #1a73e8; --success: #34a853; --text: #202124; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f8f9fa; display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        .question-text { font-size: 20px; font-weight: 700; margin: 25px 0; line-height: 1.5; min-height: 60px; }
-        input { width: 90%; padding: 12px; border: 2px solid #dadce0; border-radius: 10px; font-size: 16px; text-align: center; margin-bottom: 10px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; margin-top: 5px; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; font-weight: bold; }
-        .correct { background: #e6f4ea; color: #137333; }
-        .wrong { background: #fce8e6; color: #c5221f; }
-        .admin-section { margin-top: 30px; border-top: 2px dashed #eee; padding-top: 20px; text-align: right; }
-        .word-list { max-height: 150px; overflow-y: auto; background: #f1f3f4; padding: 10px; border-radius: 8px; font-size: 13px; }
+        :root { --primary: #1a73e8; --success: #34a853; --error: #d93025; --bg: #f8f9fa; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        .question-text { font-size: 20px; font-weight: 700; margin: 20px 0; min-height: 70px; line-height: 1.5; }
+        
+        /* מקלדת תווים */
+        .char-keypad { display: flex; justify-content: center; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+        .char-btn { background: #e8f0fe; border: 1px solid #1a73e8; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
+
+        input { width: 90%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; text-align: center; margin-bottom: 15px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
+        
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 12px; display: none; text-align: right; line-height: 1.4; }
+        .correct { background: #e6f4ea; color: #137333; border: 1px solid #137333; }
+        .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
+        .explanation { font-size: 14px; margin-top: 8px; color: #5f6368; font-weight: normal; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div id="category" style="font-size:12px; color:gray">תרגול פעלים ומשפטים מחוברים</div>
-    <div id="question" class="question-text">טוען שאלה...</div>
-    <input type="text" id="answer" placeholder="התשובה בתעתיק..." autocomplete="off">
-    <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
-    <div id="feedback" class="feedback"></div>
-    <button id="next-btn" class="btn" style="display:none; background: var(--success);" onclick="generateQuestion()">לשאלה הבאה ⮕</button>
-
-    <div class="admin-section">
-        <details>
-            <summary><b>ניהול מאגר הפעלים שלי ⚙️</b></summary>
-            <div id="wordList" class="word-list"></div>
-            <div style="margin-top:10px">
-                <input type="text" id="newH" placeholder="עברית (למשל: סגר)">
-                <input type="text" id="newS" placeholder="ערבית (למשל: סַכַּר)">
-                <button class="btn" style="background:#5f6368" onclick="addWord()">הוסף פועל חדש</button>
-            </div>
-        </details>
+    <div id="question" class="question-text">טוען...</div>
+    
+    <div class="char-keypad">
+        <button class="char-btn" onclick="addChar('\'')">'</button>
+        <button class="char-btn" onclick="addChar('ח\'')">ח'</button>
+        <button class="char-btn" onclick="addChar('ע\'')">ע'</button>
+        <button class="char-btn" onclick="addChar('ט\'')">ט'</button>
+        <button class="char-btn" onclick="addChar('צ\'')">צ'</button>
     </div>
+
+    <input type="text" id="answer" placeholder="הקלד תשובה..." autocomplete="off">
+    <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
+    
+    <div id="feedback" class="feedback"></div>
+    <button id="next-btn" class="btn" style="display:none; background: var(--success); margin-top:10px" onclick="generateQuestion()">שאלה הבאה ⮕</button>
 </div>
 
 <script>
-    const originalList = [
-        { h: 'אכל', s: 'אכל' }, { h: 'פתח', s: 'פתח' }, { h: 'ישב', s: 'קעד' },
-        { h: 'שאל', s: 'סאל' }, { h: 'נכנס', s: 'דח\'ל' }, { h: 'שחה', s: 'סבח' },
-        { h: 'בישל', s: 'טבח\'' }, { h: 'עבר דירה/עבודה', s: 'נַקַל' }, { h: 'בא', s: 'אִגַ\'א' },
-        { h: 'דיבר/סיפר', s: 'חַכַּא' }, { h: 'נתן', s: 'אִעְטַא' }, { h: 'קנה', s: 'אִשְתַרַא' },
-        { h: 'יצא', s: 'טִלִע' }, { h: 'שתה', s: 'שִׁרִבּ' }, { h: 'לקח/קיבל', s: 'אַחַ\'ד' },
-        { h: 'נהג', s: 'סאק' }, { h: 'ראה', s: 'שאף' }, { h: 'נישק', s: 'באס' },
-        { h: 'ביקר', s: 'זאר' }, { h: 'היה', s: 'כאן' }, { h: 'הלך', s: 'ראח' }
-    ];
+    const dictionary = {
+        verbs: [
+            {h:'אכל', s:'אכל', t:'reg'}, {h:'פתח', s:'פתח', t:'reg'}, {h:'ישב', s:'קעד', t:'reg'},
+            {h:'בישל', s:'טבח\'', t:'reg'}, {h:'שתה', s:'שרב', t:'reg'}, {h:'לקח', s:'אח\'ד', t:'reg'},
+            {h:'קנה', s:'אשתרא', t:'endA'}, {h:'דיבר', s:'חכּא', t:'endA'}, {h:'בא', s:'אג\'א', t:'endA'},
+            {h:'נהג', s:'סאק', t:'hollow'}, {h:'ראה', s:'שאף', t:'hollow'}, {h:'ביקר', s:'זאר', t:'hollow'}
+        ],
+        nouns: [
+            {h:'שכן', s:'ג\'אר', p:'ג\'יראן', d:'ג\'ארין'},
+            {h:'תפוח', s:'תפאחה', p:'תפאח', d:'תפאחתיין'},
+            {h:'כיסא', s:'כרסי', p:'כראסי', d:'כרסיין'}
+        ]
+    };
 
-    let myVerbs = JSON.parse(localStorage.getItem('myVerbs')) || originalList;
     let cur = {};
 
-    function updateAdminList() {
-        const list = document.getElementById('wordList');
-        list.innerHTML = myVerbs.map((v, i) => `<div>${v.h} - ${v.s} <span style="color:red; cursor:pointer" onclick="removeWord(${i})">[X]</span></div>`).join('');
+    function addChar(c) {
+        document.getElementById('answer').value += c;
+        document.getElementById('answer').focus();
     }
 
-    function addWord() {
-        const h = document.getElementById('newH').value;
-        const s = document.getElementById('newS').value;
-        if(h && s) {
-            myVerbs.push({h, s});
-            localStorage.setItem('myVerbs', JSON.stringify(myVerbs));
-            updateAdminList();
-            document.getElementById('newH').value = ''; document.getElementById('newS').value = '';
+    function getPast(v, person) {
+        if (person === 'he') return { word: v.s, exp: "בגוף 'הוא' בעבר, המילה נשארת בצורת המקור שלה." };
+        
+        if (v.t === 'endA') {
+            let res = v.s.slice(0, -1) + "ית";
+            return { word: res, exp: "פועל שמסתיים ב-א' או י' מקבל סיומת '-ית' בגוף אני." };
         }
-    }
-
-    function removeWord(i) {
-        myVerbs.splice(i, 1);
-        localStorage.setItem('myVerbs', JSON.stringify(myVerbs));
-        updateAdminList();
+        if (v.t === 'hollow') {
+            let res = v.s === 'שאף' ? 'שופת' : v.s === 'סאק' ? 'סוקת' : v.s === 'זאר' ? 'זורת' : v.s.replace('א', 'ו') + "ת";
+            return { word: res, exp: "פועל 'חלול' (עם א' באמצע) - בנטיית עבר ה-א' הופכת לרוב ל-ו' או י' קצרה." };
+        }
+        return { word: v.s + "ת", exp: "פועל רגיל בעבר מקבל סיומת 'ת' (סוכּון) בסוף המילה." };
     }
 
     function generateQuestion() {
@@ -83,22 +85,19 @@
         document.getElementById('action-btn').style.display = 'block';
         document.getElementById('answer').value = '';
 
-        const v1 = myVerbs[Math.floor(Math.random() * myVerbs.length)];
-        const v2 = myVerbs[Math.floor(Math.random() * myVerbs.length)];
-        const isJoint = Math.random() > 0.6 && v1 !== v2;
-
-        function getPast(verb) {
-            if (verb.s.endsWith("א") || verb.s.endsWith("י")) return verb.s.slice(0, -1) + "ית";
-            return verb.s + "ת";
-        }
-
-        if (isJoint) {
-            cur = {
-                text: `איך אומרים: "אני ${v1.h}תי וגם ${v2.h}תי"?`,
-                ans: getPast(v1) + " וּ" + getPast(v2)
-            };
+        const r = Math.random();
+        if (r < 0.5) {
+            const v = dictionary.verbs[Math.floor(Math.random() * dictionary.verbs.length)];
+            const res = getPast(v, 'io');
+            cur = { text: `איך אומרים: "אני ${v.h}תי"?`, ans: res.word, exp: res.exp };
         } else {
-            cur = { text: `איך אומרים: "הוא ${v1.h}"?`, ans: v1.s };
+            const n = dictionary.nouns[Math.floor(Math.random() * dictionary.nouns.length)];
+            const isPlural = Math.random() > 0.5;
+            cur = { 
+                text: isPlural ? `איך אומרים: "${n.h}נים" (רבים)?` : `איך אומרים: "שני ${n.h}נים" (זוגי)?`, 
+                ans: isPlural ? n.p : n.d,
+                exp: isPlural ? `בערבית הריבוי הוא לרוב 'שבור' (שינוי פנימי במילה) ולא סיומת קבועה.` : `בזוגי מוסיפים את הסיומת '-יין' לשם העצם.`
+            };
         }
         document.getElementById('question').innerText = cur.text;
     }
@@ -107,18 +106,20 @@
         const u = document.getElementById('answer').value.trim().toLowerCase().replace(/'/g, "");
         const a = cur.ans.toLowerCase().replace(/'/g, "");
         const f = document.getElementById('feedback');
-        if (u === a || u.includes(a)) {
-            f.innerText = "נכון!"; f.className = "feedback correct";
+        
+        if (u === a || u === a.replace(/ /g, "")) {
+            f.innerHTML = `<b>נכון!</b><div class="explanation">${cur.exp}</div>`;
+            f.className = "feedback correct";
         } else {
-            f.innerHTML = `התשובה: <b>${cur.ans}</b>`; f.className = "feedback wrong";
+            f.innerHTML = `<b>טעות.</b> התשובה היא: <b>${cur.ans}</b><div class="explanation">${cur.exp}</div>`;
+            f.className = "feedback wrong";
         }
         f.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('action-btn').style.display = 'none';
     }
 
-    updateAdminList();
-    generateQuestion();
+    window.onload = generateQuestion;
 </script>
 </body>
 </html>
