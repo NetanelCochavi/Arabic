@@ -3,20 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית חכם 7.0</title>
+    <title>מתרגל ערבית - גרסה 8.0</title>
     <style>
         :root { --primary: #1a73e8; --success: #34a853; --error: #d93025; --bg: #f8f9fa; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        .question-text { font-size: 20px; font-weight: 700; margin: 20px 0; min-height: 70px; line-height: 1.5; }
-        
-        /* מקלדת תווים */
-        .char-keypad { display: flex; justify-content: center; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
-        .char-btn { background: #e8f0fe; border: 1px solid #1a73e8; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
-
-        input { width: 90%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; text-align: center; margin-bottom: 15px; }
+        .question-text { font-size: 20px; font-weight: 700; margin: 25px 0; min-height: 60px; line-height: 1.5; }
+        input { width: 90%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; text-align: center; margin-bottom: 20px; }
         .btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
-        
         .feedback { margin-top: 20px; padding: 15px; border-radius: 12px; display: none; text-align: right; line-height: 1.4; }
         .correct { background: #e6f4ea; color: #137333; border: 1px solid #137333; }
         .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
@@ -27,18 +21,8 @@
 
 <div class="card">
     <div id="question" class="question-text">טוען...</div>
-    
-    <div class="char-keypad">
-        <button class="char-btn" onclick="addChar('\'')">'</button>
-        <button class="char-btn" onclick="addChar('ח\'')">ח'</button>
-        <button class="char-btn" onclick="addChar('ע\'')">ע'</button>
-        <button class="char-btn" onclick="addChar('ט\'')">ט'</button>
-        <button class="char-btn" onclick="addChar('צ\'')">צ'</button>
-    </div>
-
     <input type="text" id="answer" placeholder="הקלד תשובה..." autocomplete="off">
     <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
-    
     <div id="feedback" class="feedback"></div>
     <button id="next-btn" class="btn" style="display:none; background: var(--success); margin-top:10px" onclick="generateQuestion()">שאלה הבאה ⮕</button>
 </div>
@@ -46,37 +30,28 @@
 <script>
     const dictionary = {
         verbs: [
-            {h:'אכל', s:'אכל', t:'reg'}, {h:'פתח', s:'פתח', t:'reg'}, {h:'ישב', s:'קעד', t:'reg'},
+            {h:'אכל', s:'אכל', t:'reg'}, {h:'فتح', s:'פתח', t:'reg'}, {h:'ישב', s:'קעד', t:'reg'},
             {h:'בישל', s:'טבח\'', t:'reg'}, {h:'שתה', s:'שרב', t:'reg'}, {h:'לקח', s:'אח\'ד', t:'reg'},
             {h:'קנה', s:'אשתרא', t:'endA'}, {h:'דיבר', s:'חכּא', t:'endA'}, {h:'בא', s:'אג\'א', t:'endA'},
             {h:'נהג', s:'סאק', t:'hollow'}, {h:'ראה', s:'שאף', t:'hollow'}, {h:'ביקר', s:'זאר', t:'hollow'}
         ],
         nouns: [
-            {h:'שכן', s:'ג\'אר', p:'ג\'יראן', d:'ג\'ארין'},
-            {h:'תפוח', s:'תפאחה', p:'תפאח', d:'תפאחתיין'},
-            {h:'כיסא', s:'כרסי', p:'כראסי', d:'כרסיין'}
+            {h:'שכנים', s:'ג\'אר', p:'ג\'יראן', d:'ג\'ארין', single:'שכן', pair:'שני שכנים'},
+            {h:'תפוחים', s:'תפאחה', p:'תפאח', d:'תפאחתיין', single:'תפוח', pair:'שני תפוחים'},
+            {h:'כיסאות', s:'כרסי', p:'כראסי', d:'כרסיין', single:'כיסא', pair:'שני כיסאות'}
         ]
     };
 
     let cur = {};
 
-    function addChar(c) {
-        document.getElementById('answer').value += c;
-        document.getElementById('answer').focus();
-    }
-
     function getPast(v, person) {
-        if (person === 'he') return { word: v.s, exp: "בגוף 'הוא' בעבר, המילה נשארת בצורת המקור שלה." };
-        
-        if (v.t === 'endA') {
-            let res = v.s.slice(0, -1) + "ית";
-            return { word: res, exp: "פועל שמסתיים ב-א' או י' מקבל סיומת '-ית' בגוף אני." };
-        }
+        if (person === 'he') return { word: v.s, exp: "בגוף 'הוא' בעבר, הפועל נשאר בצורת המקור שלו." };
+        if (v.t === 'endA') return { word: v.s.slice(0, -1) + "ית", exp: "פועל שמסתיים ב-א' או י' מקבל סיומת '-ית' בגוף אני." };
         if (v.t === 'hollow') {
-            let res = v.s === 'שאף' ? 'שופת' : v.s === 'סאק' ? 'סוקת' : v.s === 'זאר' ? 'זורת' : v.s.replace('א', 'ו') + "ת";
-            return { word: res, exp: "פועל 'חלול' (עם א' באמצע) - בנטיית עבר ה-א' הופכת לרוב ל-ו' או י' קצרה." };
+            const hols = { 'שאף':'שופת', 'סאק':'סוקת', 'זאר':'זורת', 'ראח':'רוחת', 'כאן':'כונת' };
+            return { word: hols[v.s] || v.s.replace('א', 'ו') + "ת", exp: "זהו פועל 'חלול' - בנטיית עבר ה-א' הופכת ל-ו' או י' קצרה." };
         }
-        return { word: v.s + "ת", exp: "פועל רגיל בעבר מקבל סיומת 'ת' (סוכּון) בסוף המילה." };
+        return { word: v.s + "ת", exp: "פועל רגיל בעבר מקבל סיומת 'ת' (סוכּון) בסוף המילה בגוף אני." };
     }
 
     function generateQuestion() {
@@ -86,7 +61,7 @@
         document.getElementById('answer').value = '';
 
         const r = Math.random();
-        if (r < 0.5) {
+        if (r < 0.6) {
             const v = dictionary.verbs[Math.floor(Math.random() * dictionary.verbs.length)];
             const res = getPast(v, 'io');
             cur = { text: `איך אומרים: "אני ${v.h}תי"?`, ans: res.word, exp: res.exp };
@@ -94,9 +69,9 @@
             const n = dictionary.nouns[Math.floor(Math.random() * dictionary.nouns.length)];
             const isPlural = Math.random() > 0.5;
             cur = { 
-                text: isPlural ? `איך אומרים: "${n.h}נים" (רבים)?` : `איך אומרים: "שני ${n.h}נים" (זוגי)?`, 
+                text: isPlural ? `איך אומרים: "${n.h}" (רבים)?` : `איך אומרים: "${n.pair}" (זוגי)?`, 
                 ans: isPlural ? n.p : n.d,
-                exp: isPlural ? `בערבית הריבוי הוא לרוב 'שבור' (שינוי פנימי במילה) ולא סיומת קבועה.` : `בזוגי מוסיפים את הסיומת '-יין' לשם העצם.`
+                exp: isPlural ? `בערבית הריבוי הוא לרוב 'שבור' - שינוי פנימי במבנה המילה.` : `בצורת הזוגי (מוסנא) מוסיפים את הסיומת '-יין' לשם העצם.`
             };
         }
         document.getElementById('question').innerText = cur.text;
