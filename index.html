@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית למתקדמים</title>
+    <title>מתרגל ערבית - מילות דבק ומבנה משפט</title>
     <style>
-        :root { --primary: #1a73e8; --success: #34a853; --error: #d93025; --bg: #f1f3f4; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
+        :root { --primary: #1a73e8; --success: #34a853; --bg: #f8f9fa; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
         .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 550px; text-align: right; }
         .question-box { background: #e8f0fe; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-right: 5px solid var(--primary); }
-        .question-text { font-size: 20px; font-weight: 700; color: #202124; line-height: 1.6; }
+        .question-text { font-size: 19px; font-weight: 700; color: #202124; line-height: 1.6; }
         input { width: 100%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
         .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
         .feedback { margin-top: 25px; padding: 20px; border-radius: 12px; display: none; }
         .correct { background: #e6f4ea; color: #137333; border: 1px solid #137333; }
         .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
-        .explanation-header { font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; }
-        .explanation-text { font-size: 15px; line-height: 1.5; color: #3c4043; }
+        .explanation-text { font-size: 14px; line-height: 1.5; color: #3c4043; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="question-box">
-        <div id="question" class="question-text">מייצר תרגיל מורכב...</div>
+        <div id="question" class="question-text">מייצר משפט מורכב...</div>
     </div>
     
     <input type="text" id="answer" placeholder="הקלד תשובה בתעתיק..." autocomplete="off">
     <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
     
     <div id="feedback" class="feedback">
-        <div id="feedback-status" class="explanation-header"></div>
-        <div id="feedback-ans" style="font-size: 18px; margin-bottom: 10px;"></div>
+        <div id="feedback-status" style="font-weight:bold; margin-bottom:8px;"></div>
+        <div id="feedback-ans" style="font-size: 19px; margin-bottom: 5px;"></div>
         <div id="feedback-exp" class="explanation-text"></div>
     </div>
     
@@ -39,42 +38,30 @@
 </div>
 
 <script>
-    const data = {
-        verbs: [
-            {h:'אכל', s:'אכל', t:'reg', q:'אכל'}, {h:'פתח', s:'פתח', t:'reg', q:'פתח'},
-            {h:'קנה', s:'אשתרא', t:'endA', q:'קני'}, {h:'ראה', s:'שאף', t:'hollow', q:'ראי'},
-            {h:'נהג', s:'סאק', t:'hollow', q:'נהג'}, {h:'שתה', s:'שרב', t:'reg', q:'שתי'},
-            {h:'ביקר', s:'זאר', t:'hollow', q:'ביקר'}, {h:'דיבר', s:'חכּא', t:'endA', q:'דיבר'}
-        ],
-        nouns: [
-            {h:'תפוחים', s:'תפאחה', p:'תפאח', d:'תפאחתיין'},
-            {h:'שכנים', s:'ג\'אר', p:'ג\'יראן', d:'ג\'ארין'},
-            {h:'כיסאות', s:'כרסי', p:'כראסי', d:'כרסיין'}
-        ],
-        conjunctions: [
-            {h:'כי הייתי עייף', s:'לאנו כונת תעבאן'},
-            {h:'כי לא היה לי זמן', s:'לאנו מא כאן ענדי וקת'},
-            {h:'אבל לא ראיתי אותם', s:'בס מא שופתהום'}
-        ]
-    };
+    const verbs = [
+        {h:'אכל', s:'אכל', t:'reg', q:'אכל'}, {h:'קנה', s:'אשתרא', t:'endA', q:'קני'},
+        {h:'ראה', s:'שאף', t:'hollow', q:'ראי'}, {h:'ביקר', s:'זאר', t:'hollow', q:'ביקר'},
+        {h:'דיבר', s:'חכּא', t:'endA', q:'דיבר'}, {h:'נהג', s:'סאק', t:'hollow', q:'נהג'}
+    ];
+
+    const connectors = [
+        {h:'לפני ש', s:'קבל מא'}, {h:'אחרי ש', s:'בעד מא'},
+        {h:'כאשר', s:'למא'}, {h:'עם', s:'מע'}, {h:'אצל', s:'ענד'}
+    ];
+
+    const nouns = [
+        {h:'השכנים', s:'אלג\'יראן'}, {h:'התפוחים', s:'אלתפאח'}, {h:'החברים', s:'אלאסחאב'}
+    ];
 
     let cur = {};
 
-    function getVerbForm(v, isNeg) {
-        let res = "";
-        let exp = "";
-        if (v.t === 'endA') {
-            res = v.s.slice(0, -1) + "ית";
-            exp = `הפועל ${v.s} מסתיים באות א'/י', לכן בנטיית "אני" הסיומת הופכת ל "-ית". `;
-        } else if (v.t === 'hollow') {
-            const hols = { 'שאף':'שופת', 'סאק':'סוקת', 'זאר':'זורת', 'כאן':'כונת' };
-            res = hols[v.s];
-            exp = `הפועל ${v.s} הוא פועל חלול. בנטיית עבר ה-א' נשמטת והתנועה משתנה ל-u. `;
-        } else {
-            res = v.s + "ת";
-            exp = `פועל רגיל בעבר מקבל סיומת 'ת' (סוכּון). `;
+    function getVerbForm(v) {
+        if (v.t === 'endA') return { s: v.s.slice(0, -1) + "ית", exp: "פועל סופי (א'/י') מקבל סיומת -ית." };
+        if (v.t === 'hollow') {
+            const hols = { 'שאף':'שופת', 'סאק':'סוקת', 'זאר':'זורת' };
+            return { s: hols[v.s], exp: "פועל חלול - ה-א' נשמטת והתנועה משתנה ל-u." };
         }
-        return { s: (isNeg ? "מא " : "") + res, exp: exp + (isNeg ? "השלילה בעבר מתבצעת בעזרת המילה 'מא'." : "") };
+        return { s: v.s + "ת", exp: "פועל רגיל בעבר מקבל סיומת ת'." };
     }
 
     function generateQuestion() {
@@ -83,50 +70,45 @@
         document.getElementById('action-btn').style.display = 'block';
         document.getElementById('answer').value = '';
 
-        const v = data.verbs[Math.floor(Math.random() * data.verbs.length)];
-        const n = data.nouns[Math.floor(Math.random() * data.nouns.length)];
-        const c = data.conjunctions[Math.floor(Math.random() * data.conjunctions.length)];
-        const num = [2, 5, 15][Math.floor(Math.random() * 3)];
-        const isNeg = Math.random() > 0.5;
+        const v1 = verbs[Math.floor(Math.random() * verbs.length)];
+        const v2 = verbs[Math.floor(Math.random() * verbs.length)];
+        const conn = connectors[Math.floor(Math.random() * connectors.length)];
+        const n = nouns[Math.floor(Math.random() * nouns.length)];
 
-        const verbInfo = getVerbForm(v, isNeg);
-        let qHeb = `איך אומרים: "${isNeg ? 'לא ' : ''}${v.q}תי ${num === 2 ? '2' : num} ${n.h} ${c.h}"?`;
-        
-        let ansAr = verbInfo.s + " ";
-        let numExp = "";
-        
-        if (num === 2) {
-            ansAr += n.d;
-            numExp = "בזוגי מוסיפים את הסיומת '-יין' לשם העצם.";
-        } else if (num === 5) {
-            ansAr += "חמסה " + n.p;
-            numExp = "במספרים 3-10 שם העצם יבוא בצורת רבים.";
+        const vf1 = getVerbForm(v1);
+        const vf2 = getVerbForm(v2);
+
+        let q, a, exp;
+
+        if (conn.h.includes('ש')) {
+            q = `איך אומרים: "${v1.q}תי ${n.h} ${conn.h}${v2.q}תי"?`;
+            a = `${vf1.s} ${n.s} ${conn.s} ${vf2.s}`;
+            exp = `שימוש במילת הקישור <b>${conn.s}</b> לחיבור שני משפטים בעבר. <br>${vf1.exp} <br>${vf2.exp}`;
         } else {
-            ansAr += "חמסטעשר " + n.s;
-            numExp = "מעל מספר 10, שם העצם יבוא תמיד בצורת יחיד.";
+            q = `איך אומרים: "${v1.q}תי ${conn.h} ${n.h}"?`;
+            a = `${vf1.s} ${conn.s} ${n.s}`;
+            exp = `מילת היחס <b>${conn.s}</b> מחברת בין הפועל לשם העצם. <br>${vf1.exp}`;
         }
-        
-        ansAr += " " + c.s;
 
-        cur = { text: qHeb, ans: ansAr, exp: verbInfo.exp + " " + numExp };
+        cur = { text: q, ans: a, exp: exp };
         document.getElementById('question').innerText = cur.text;
     }
 
     function checkAnswer() {
-        const u = document.getElementById('answer').value.trim().replace(/'/g, "");
-        const a = cur.ans.replace(/'/g, "");
+        const u = document.getElementById('answer').value.trim().toLowerCase().replace(/'/g, "");
+        const a = cur.ans.toLowerCase().replace(/'/g, "");
         const f = document.getElementById('feedback');
         
-        if (u.toLowerCase() === a.toLowerCase() || u.toLowerCase() === a.replace(/ /g, "").toLowerCase()) {
-            document.getElementById('feedback-status').innerText = "כל הכבוד! תשובה מדויקת.";
+        if (u === a || u === a.replace(/ /g, "")) {
+            document.getElementById('feedback-status').innerText = "מעולה! ✅";
             f.className = "feedback correct";
         } else {
-            document.getElementById('feedback-status').innerText = "לא נורא, ככה לומדים:";
+            document.getElementById('feedback-status').innerText = "טעות ❌";
             f.className = "feedback wrong";
         }
         
         document.getElementById('feedback-ans').innerHTML = `התשובה: <b>${cur.ans}</b>`;
-        document.getElementById('feedback-exp').innerText = cur.exp;
+        document.getElementById('feedback-exp').innerHTML = cur.exp;
         f.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('action-btn').style.display = 'none';
