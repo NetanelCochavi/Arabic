@@ -3,79 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתרגל ערבית - גרסה 15.0</title>
+    <title>מתרגל ערבית - Pro Edition</title>
     <style>
-        :root { --primary: #1a73e8; --success: #34a853; --bg: #f8f9fa; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .card { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: right; }
-        .question-box { background: #e8f0fe; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-right: 5px solid var(--primary); }
-        .question-text { font-size: 19px; font-weight: 700; color: #202124; line-height: 1.6; }
-        input { width: 100%; padding: 15px; border: 2px solid #dadce0; border-radius: 12px; font-size: 18px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
-        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
-        .feedback { margin-top: 20px; padding: 20px; border-radius: 15px; display: none; border: 1px solid #ddd; }
-        .correct { background: #e6f4ea; color: #137333; border-color: #34a853; }
-        .wrong { background: #fce8e6; color: #c5221f; border-color: #d93025; }
-        .explanation-section { margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; font-size: 14px; }
-        .step { margin-bottom: 8px; display: flex; gap: 8px; }
-        .step-icon { color: var(--primary); font-weight: bold; }
+        :root { --primary: #1a73e8; --success: #34a853; --error: #d93025; --bg: #f8f9fa; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: right; }
+        .question-box { background: #e8f0fe; padding: 25px; border-radius: 20px; margin-bottom: 25px; border-right: 6px solid var(--primary); }
+        .question-text { font-size: 21px; font-weight: 800; color: #202124; line-height: 1.6; }
+        input { width: 100%; padding: 18px; border: 2px solid #dadce0; border-radius: 14px; font-size: 19px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
+        .btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 14px; cursor: pointer; font-size: 18px; width: 100%; font-weight: bold; }
+        .feedback { margin-top: 25px; padding: 20px; border-radius: 18px; display: none; }
+        .correct { background: #e6f4ea; color: #137333; border: 1px solid #34a853; }
+        .wrong { background: #fce8e6; color: #c5221f; border: 1px solid #d93025; }
+        .explanation { font-size: 15px; line-height: 1.6; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div style="text-align:center; font-weight:bold; color:var(--primary); margin-bottom:15px;">מתרגל ערבית למתקדמים 🧠</div>
     <div class="question-box">
-        <div id="question" class="question-text">מייצר תרגיל...</div>
+        <div id="question" class="question-text">מייצר תרגיל מתקדם...</div>
     </div>
     
     <input type="text" id="answer" placeholder="הקלד תשובה בתעתיק..." autocomplete="off">
     <button id="action-btn" class="btn" onclick="checkAnswer()">בדוק תשובה</button>
     
     <div id="feedback" class="feedback">
-        <div id="status" style="font-weight:bold; font-size: 18px; margin-bottom:10px;"></div>
-        <div id="correct-ans" style="font-size: 20px; margin-bottom: 15px; text-align:center; direction:ltr;"></div>
-        <div id="exp" class="explanation-section"></div>
+        <div id="status" style="font-weight:bold; font-size: 20px; margin-bottom:10px;"></div>
+        <div id="correct-ans" style="font-size: 22px; margin-bottom: 15px; text-align:center; direction:ltr; font-weight: bold; color: var(--primary);"></div>
+        <div id="exp" class="explanation"></div>
     </div>
     
     <button id="next-btn" class="btn" style="display:none; background: var(--success); margin-top:10px" onclick="generateQuestion()">לשאלה הבאה ⮕</button>
 </div>
 
 <script>
-    // הגדרת אותיות שמש לדיוק דקדוקי
-    const sunLetters = ['ת', 'ת\'', 'ד', 'ד\'', 'ר', 'ז', 'ס', 'ש', 'צ', 'צ\'', 'ט', 'ט\'', 'ל', 'נ'];
-
-    const verbs = {
-        eat: {h:'אכלתי', s:'אכלת', t:'reg', q:'אכל'},
-        buy: {h:'קניתי', s:'אשתרית', t:'endA', q:'קני'},
-        see: {h:'ראיתי', s:'שופת', t:'hollow', q:'ראי'},
-        talk: {h:'דיברתי', s:'חכּית', t:'endA', q:'חכּא'},
-        drive: {h:'נהגתי', s:'סוקת', t:'hollow', q:'סאק'},
-        visit: {h:'ביקרתי', s:'זורת', t:'hollow', q:'זאר'}
+    // מאגר נתונים חכם עם הגדרות דקדוקיות
+    const data = {
+        verbs: [
+            {h:'ראיתי', s:'שופת', root:'שאף', type:'hollow'},
+            {h:'קניתי', s:'אשתרית', root:'אשתרא', type:'endA'},
+            {h:'אכלתי', s:'אכלת', root:'אכל', type:'reg'},
+            {h:'ביקרתי', s:'זורת', root:'זאר', type:'hollow'},
+            {h:'נהגתי', s:'סוקת', root:'סאק', type:'hollow'}
+        ],
+        nouns: [
+            {h:'התפוחים', s:'תפאח', isSun: true},
+            {h:'השכנים', s:'ג\'יראן', isSun: false},
+            {h:'החברים', s:'אסחאב', isSun: false},
+            {h:'הבית', s:'בית', isSun: false}
+        ],
+        connectors: [
+            {h:'לפני ש', s:'קבל מא'},
+            {h:'אחרי ש', s:'בעד מא'},
+            {h:'כאשר', s:'למא'}
+        ]
     };
 
-    const nouns = [
-        {h:'התפוחים', s:'תפאח', type:'sun'},
-        {h:'השכנים', s:'ג\'יראן', type:'sun'},
-        {h:'החברים', s:'אסחאב', type:'moon'},
-        {h:'הבית', s:'בית', type:'moon'}
-    ];
-
-    const logicScenarios = [
-        { v1: 'buy', n: 0, conn: 'קבל מא', connH: 'לפני ש', v2: 'eat', exp: 'קנית משהו לפני שאכלת אותו.' },
-        { v1: 'see', n: 1, conn: 'בעד מא', connH: 'אחרי ש', v2: 'visit', exp: 'ראית את השכנים אחרי שביקרת אותם.' },
-        { v1: 'drive', n: 3, conn: 'למא', connH: 'כאשר', v2: 'see', exp: 'נהגת לבית כשראית משהו.' }
-    ];
-
     let cur = {};
-
-    function getArticulatedNoun(n) {
-        // אם המילה מתחילה באות שמש, ה-ל' של אל הופכת לאות הזו
-        if (n.type === 'sun') {
-            const firstChar = n.s[0];
-            return `א-${n.s}`; 
-        }
-        return `אל${n.s}`;
-    }
 
     function generateQuestion() {
         document.getElementById('feedback').style.display = 'none';
@@ -83,39 +68,43 @@
         document.getElementById('action-btn').style.display = 'block';
         document.getElementById('answer').value = '';
 
-        const sc = logicScenarios[Math.floor(Math.random() * logicScenarios.length)];
-        const v1 = verbs[sc.v1];
-        const v2 = verbs[sc.v2];
-        const n = nouns[sc.n];
+        // הגרלת משפט עם הגיון: פועל1 -> שם עצם -> מילת קישור -> פועל2
+        const v1 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
+        const n = data.nouns[Math.floor(Math.random() * data.nouns.length)];
+        const conn = data.connectors[Math.floor(Math.random() * data.connectors.length)];
         
-        const nounWithArt = getArticulatedNoun(n);
+        // בחירת פועל שני שונה מהראשון למניעת כפילות
+        let v2 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
+        while(v2.h === v1.h) v2 = data.verbs[Math.floor(Math.random() * data.verbs.length)];
+
+        const articulatedNoun = n.isSun ? `א-${n.s}` : `אל-${n.s}`;
         
         cur = {
-            text: `איך אומרים: "${v1.h} את ${n.h} ${sc.connH} ${v2.h}"?`,
-            ans: `${v1.s} ${nounWithArt} ${sc.conn} ${v2.s}`,
-            v1: v1, v2: v2, n: n, sc: sc, art: nounWithArt
+            text: `איך אומרים: "${v1.h} את ${n.h} ${conn.h}${v2.h}"?`,
+            ans: `${v1.s} ${articulatedNoun} ${conn.s} ${v2.s}`,
+            v1, v2, n, conn, articulatedNoun
         };
 
         document.getElementById('question').innerText = cur.text;
     }
 
     function checkAnswer() {
-        const u = document.getElementById('answer').value.trim().toLowerCase().replace(/'/g, "");
-        const a = cur.ans.toLowerCase().replace(/'/g, "");
+        const u = document.getElementById('answer').value.trim().toLowerCase().replace(/'/g, "").replace(/-/g, "");
+        const a = cur.ans.toLowerCase().replace(/'/g, "").replace(/-/g, "");
         const f = document.getElementById('feedback');
         
         const isCorrect = (u === a || u === a.replace(/ /g, ""));
-        document.getElementById('status').innerText = isCorrect ? "נכון מאוד! ✅" : "טעות ❌";
+        document.getElementById('status').innerText = isCorrect ? "כל הכבוד! ✅" : "שים לב לתיקון ❌";
         f.className = isCorrect ? "feedback correct" : "feedback wrong";
-        
         document.getElementById('correct-ans').innerText = cur.ans;
         
-        // בניית הסבר מפורט
-        let expHtml = `<div class="step"><span class="step-icon">1.</span> <b>אותיות שמש:</b> המילה "${cur.n.s}" מתחילה ב-${cur.n.s[0]}, לכן אומרים <b>${cur.art}</b> ולא אל-${cur.n.s}.</div>`;
-        expHtml += `<div class="step"><span class="step-icon">2.</span> <b>הטיית פועל:</b> ${cur.v1.s} הוא פועל מסוג ${cur.v1.t === 'hollow' ? 'חלול (ה-א נעלמת)' : 'סופי (מקבל -ית)'}.</div>`;
-        expHtml += `<div class="step"><span class="step-icon">3.</span> <b>מילת קישור:</b> השתמשנו ב-${cur.sc.conn} כי היא מחברת בין שתי פעולות בעבר.</div>`;
+        // הסבר דקדוקי מפורט
+        let exp = `<b>ניתוח המשפט:</b><br>`;
+        exp += `1. <b>${cur.v1.h}:</b> בשורש חלול כמו ${cur.v1.root}, ה-א' הופכת ל-u בנטיית "אני" (<b>${cur.v1.s}</b>).<br>`;
+        exp += `2. <b>${cur.n.h}:</b> האות ${cur.n.s[0]} היא אות ${cur.n.isSun ? 'שמש' : 'ירח'}, לכן אומרים <b>${cur.articulatedNoun}</b>.<br>`;
+        exp += `3. <b>אין "את":</b> בערבית מחברים את הפועל ישירות לשם העצם המיודע.`;
         
-        document.getElementById('exp').innerHTML = expHtml;
+        document.getElementById('exp').innerHTML = exp;
         f.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('action-btn').style.display = 'none';
